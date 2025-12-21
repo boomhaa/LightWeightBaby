@@ -1,4 +1,4 @@
-package com.example.flat_rent_app.ui.theme
+package com.example.flat_rent_app.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
