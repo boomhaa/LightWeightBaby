@@ -1,6 +1,5 @@
-package com.example.flat_rent_app.ui.theme
+package com.example.flat_rent_app.presentation.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
