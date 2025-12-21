@@ -6,4 +6,5 @@ sealed class Routes(val route: String) {
     object homeScreen : Routes("home")
     object profileScreen : Routes("profile")
     object formScreen : Routes("form")
+    // обычное изменение
 }
