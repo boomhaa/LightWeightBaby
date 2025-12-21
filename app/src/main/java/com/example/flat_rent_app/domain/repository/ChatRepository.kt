@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
     fun observeMyChats(): Flow<List<Chat>>
-    fun observeMessages(chatId: String, limit: Int = 50): Flow<List<Message>>
+    fun observeMessages(chatId: String, limit: Long = 50L): Flow<List<Message>>
 
-    suspend fun sendMessage(charId: String, otherId: String, text: String): Result<Unit>
+    suspend fun sendMessage(chatId: String, otherId: String, text: String): Result<Unit>
     suspend fun markRead(chatId: String): Result<Unit>
 }

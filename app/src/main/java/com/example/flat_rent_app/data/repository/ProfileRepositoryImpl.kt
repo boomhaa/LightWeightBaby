@@ -1,0 +1,113 @@
+package com.example.flat_rent_app.data.repository
+
+import com.example.flat_rent_app.domain.model.ProfilePhoto
+import com.example.flat_rent_app.domain.model.UserProfile
+import com.example.flat_rent_app.domain.repository.AuthRepository
+import com.example.flat_rent_app.domain.repository.ProfileRepository
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class ProfileRepositoryImpl @Inject constructor(
+    private val db: FirebaseFirestore,
+    private val authRepo: AuthRepository
+) : ProfileRepository {
+
+    override fun observerProfile(uid: String): Flow<UserProfile?> = callbackFlow {
+        val reg = db.collection("users").document(uid)
+            .addSnapshotListener { snap, err ->
+                if (err != null || snap == null || !snap.exists()) {
+                    trySend(null)
+                    return@addSnapshotListener
+                }
+                trySend(snap.toUserProfile())
+            }
+        awaitClose { reg.remove() }
+    }
+
+    override suspend fun upsertMyProfile(profile: UserProfile): Result<Unit> =
+        runCatching {
+            val uid = authRepo.currentUid() ?: throw IllegalStateException("Нет авторизации")
+            val now = System.currentTimeMillis()
+
+            val slots = profile.photoSlots.map { slot ->
+                slot?.let {
+                    mapOf(
+                        "fullUrl" to it.fullUrl,
+                        "thumbUrl" to it.thumbUrl,
+                        "updatedAtMillis" to it.updatedAt
+                    )
+                }
+            }
+
+            db.collection("users").document(uid)
+                .set(
+                    mapOf(
+                        "name" to profile.name,
+                        "city" to profile.city,
+                        "eduPlace" to profile.eduPlace,
+                        "description" to profile.description,
+
+                        "mainPhotoIndex" to profile.mainPhotoIndex,
+                        "photoSlots" to slots,
+
+                        "updatedAtMillis" to now,
+                        "createdAtMillis" to (profile.createdAtMillis ?: now)
+                    ),
+                    SetOptions.merge()
+                )
+                .await()
+
+            Unit
+        }.recoverCatching { t ->
+            throw RuntimeException(t.message ?: "Ошибка сохранения профиля", t)
+        }
+
+    override suspend fun getFeedProfiles(limit: Int): Result<List<UserProfile>> =
+        runCatching {
+            val myUid = authRepo.currentUid() ?: throw IllegalStateException("Нет авторизации")
+
+            val snap = db.collection("users")
+                .orderBy("updatedAtMillis", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get()
+                .await()
+
+            snap.documents.mapNotNull { d ->
+                if (d.id == myUid) null else d.toUserProfile()
+            }
+        }.recoverCatching { t ->
+            throw RuntimeException(t.message ?: "Ошибка загрузки кандидатов", t)
+        }
+
+    private fun DocumentSnapshot.toUserProfile(): UserProfile {
+        val slots = (get("photoSlots") as? List<*>)?.map { item ->
+            val m = item as? Map<*, *> ?: return@map null
+            ProfilePhoto(
+                fullUrl = m["fullUrl"] as? String,
+                thumbUrl = m["thumbUrl"] as? String,
+                updatedAt = (m["updatedAtMillis"] as? Number)?.toLong()
+            )
+        } ?: listOf(null, null, null)
+
+        return UserProfile(
+            uid = id,
+            name = getString("name").orEmpty(),
+            city = getString("city").orEmpty(),
+            eduPlace = getString("eduPlace").orEmpty(),
+            description = getString("description").orEmpty(),
+            mainPhotoIndex = ((getLong("mainPhotoIndex") ?: 0L).toInt()).coerceIn(0, 2),
+            photoSlots = slots.take(3).let { it + List(maxOf(0, 3 - it.size)) { null } },
+            createdAtMillis = getLong("createdAtMillis"),
+            updatedAtMillis = getLong("updatedAtMillis")
+        )
+    }
+}

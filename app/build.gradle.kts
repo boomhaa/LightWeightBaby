@@ -20,7 +20,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+           }
 
     buildTypes {
         release {
@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -66,6 +67,9 @@ dependencies {
     implementation(libs.retrofit.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.okhttp.logging)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    ksp(libs.moshi.kotlin.codegen)
 
     // Navigation
     implementation(libs.navigation.compose)
