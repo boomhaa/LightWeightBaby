@@ -30,7 +30,7 @@ import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingVie
 fun OnbPhotoScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current

@@ -27,7 +27,7 @@ import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingVie
 fun OnbAboutScreen(
     onBack: () -> Unit,
     onFinish: () -> Unit,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel
 ) {
     val state by viewModel.state.collectAsState()
 

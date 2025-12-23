@@ -23,7 +23,7 @@ import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingVie
 @Composable
 fun OnbNameScreen(
     onNext: () -> Unit,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel
 ) {
     val state by viewModel.state.collectAsState()
 
