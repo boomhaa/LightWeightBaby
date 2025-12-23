@@ -9,7 +9,7 @@ import com.example.flat_rent_app.presentation.navigation.appgraphs.AppGraph
 import com.example.flat_rent_app.presentation.navigation.appgraphs.AuthGraph
 import com.example.flat_rent_app.presentation.viewmodel.RootViewModel
 
-
+//comment
 @Composable
 fun AppNav() {
     val rootVm: RootViewModel = hiltViewModel()
