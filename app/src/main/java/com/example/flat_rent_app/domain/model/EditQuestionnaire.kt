@@ -1,6 +1,6 @@
 package com.example.flat_rent_app.domain.model
 
-data class UserProfile(
+data class EditQuestionnaire(
     val uid: String = "",
     val name: String = "",
     val city: String = "",

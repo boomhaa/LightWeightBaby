@@ -3,11 +3,13 @@ package com.example.flat_rent_app.di
 import com.example.flat_rent_app.data.remote.api.PhotoApi
 import com.example.flat_rent_app.data.repository.AuthRepositoryImpl
 import com.example.flat_rent_app.data.repository.ChatRepositoryImpl
+import com.example.flat_rent_app.data.repository.EditQuestionnaireRepositoryImpl
 import com.example.flat_rent_app.data.repository.PhotoRepositoryImpl
 import com.example.flat_rent_app.data.repository.ProfileRepositoryImpl
 import com.example.flat_rent_app.data.repository.SwipeRepositoryImpl
 import com.example.flat_rent_app.domain.repository.AuthRepository
 import com.example.flat_rent_app.domain.repository.ChatRepository
+import com.example.flat_rent_app.domain.repository.EditQuestionnaireRepository
 import com.example.flat_rent_app.domain.repository.PhotoRepository
 import com.example.flat_rent_app.domain.repository.ProfileRepository
 import com.example.flat_rent_app.domain.repository.SwipeRepository
@@ -55,4 +57,10 @@ object RepositoryModule {
     fun providePhotoRepository(
         api: PhotoApi
     ): PhotoRepository = PhotoRepositoryImpl(api)
+
+    @Provides
+    @Singleton
+    fun provideEditQuestionnaire(
+        db: FirebaseFirestore
+    ) : EditQuestionnaireRepository = EditQuestionnaireRepositoryImpl(db)
 }
