@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -21,9 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingViewModel
 
 @Composable
@@ -62,10 +67,19 @@ fun OnbPhotoScreen(
                 Text("Выбрать фото из галереи")
             }
 
-            Text(
-                "Выбрано: ${state.pickedPhotoUri?.toString() ?: "-"}",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (state.pickedPhotoUri != null || state.uploadedPhoto != null) {
+                val model = state.uploadedPhoto?.fullUrl ?: state.pickedPhotoUri
+
+                AsyncImage(
+                    model = model,
+                    contentDescription = "Главное фото",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -78,10 +92,8 @@ fun OnbPhotoScreen(
                 }
                 Text("Загрузить как главное фото")
             }
-
             state.uploadedPhoto?.let { p ->
                 Text("Загружено ✅", style = MaterialTheme.typography.bodyMedium)
-                Text("fullUrl: ${p.fullUrl ?: "-"}", style = MaterialTheme.typography.bodySmall)
             }
 
             state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }

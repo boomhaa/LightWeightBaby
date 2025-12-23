@@ -58,6 +58,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.vm.compose)
 
+    //coil
+    implementation(libs.coil.compose)
+
     // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
