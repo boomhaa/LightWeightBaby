@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flat_rent_app.domain.model.ProfilePhoto
+import com.example.flat_rent_app.domain.model.OnboardingState
 import com.example.flat_rent_app.domain.model.UserProfile
 import com.example.flat_rent_app.domain.repository.AuthRepository
 import com.example.flat_rent_app.domain.repository.PhotoRepository
@@ -16,18 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class OnboardingState(
-    val name: String = "",
-    val city: String = "",
-    val eduPlace: String = "",
-    val description: String = "",
-    val pickedPhotoUri: Uri? = null,
-    val uploadedPhoto: ProfilePhoto? = null,
-    val loading: Boolean = false,
-    val saved: Boolean = false,
-    val error: String? = null
-)
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -43,6 +31,12 @@ class OnboardingViewModel @Inject constructor(
     fun onCity(v: String) = _state.update { it.copy(city = v, error = null) }
     fun onEduPlace(v: String) = _state.update { it.copy(eduPlace = v, error = null) }
     fun onDescription(v: String) = _state.update { it.copy(description = v, error = null) }
+
+
+    fun togglePreference(pref: String) = _state.update { s ->
+        val next = if (pref in s.preferences) s.preferences - pref else s.preferences + pref
+        s.copy(preferences = next, error = null)
+    }
 
     fun onPickedPhoto(uri: Uri?) {
         _state.value = _state.value.copy(pickedPhotoUri = uri, error = null)
@@ -104,7 +98,8 @@ class OnboardingViewModel @Inject constructor(
                 eduPlace = s.eduPlace.trim(),
                 description = s.description.trim(),
                 mainPhotoIndex = 0,
-                photoSlots = listOf(s.uploadedPhoto, null, null)
+                photoSlots = listOf(s.uploadedPhoto, null, null),
+                preferences = s.preferences.toList()
             )
 
             val res = profileRepo.upsertMyProfile(profile)

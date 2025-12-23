@@ -16,11 +16,9 @@ fun AppNav() {
     val user by rootVm.user.collectAsState()
     val isComplete by rootVm.isProfileComplete.collectAsState()
 
-    if (user == null) {
-        AuthGraph()
-    } else if (!isComplete) {
-        OnboardingGraph()
-    } else {
-        AppGraph()
+    when {
+        user == null -> AuthGraph()
+        !isComplete -> OnboardingGraph()
+        else -> AppGraph()
     }
 }

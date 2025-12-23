@@ -11,6 +11,7 @@ import com.example.flat_rent_app.presentation.navigation.Routes
 import com.example.flat_rent_app.presentation.screens.onboarding.OnbAboutScreen
 import com.example.flat_rent_app.presentation.screens.onboarding.OnbNameScreen
 import com.example.flat_rent_app.presentation.screens.onboarding.OnbPhotoScreen
+import com.example.flat_rent_app.presentation.screens.onboarding.OnbPrefsScreen
 import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingViewModel
 
 @SuppressLint("UnrememberedGetBackStackEntry")
@@ -43,6 +44,19 @@ fun OnboardingGraph() {
             val vm: OnboardingViewModel = hiltViewModel(parentEntry)
 
             OnbPhotoScreen(
+                onBack = { navController.popBackStack() },
+                onNext = { navController.navigate(Routes.onbPrefsScreen.route) },
+                viewModel = vm
+            )
+        }
+
+        composable(Routes.onbPrefsScreen.route) {
+            val parentEntry = remember(navController, graphRoute) {
+                navController.getBackStackEntry(graphRoute)
+            }
+            val vm: OnboardingViewModel = hiltViewModel(parentEntry)
+
+            OnbPrefsScreen(
                 onBack = { navController.popBackStack() },
                 onNext = { navController.navigate(Routes.onbAboutScreen.route) },
                 viewModel = vm

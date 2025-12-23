@@ -9,6 +9,6 @@ data class UserProfile(
     val mainPhotoIndex: Int = 0,
     val photoSlots: List<ProfilePhoto?> = listOf(null, null, null),
     val createdAtMillis: Long? = null,
-    val updatedAtMillis: Long? = null
-
+    val updatedAtMillis: Long? = null,
+    val preferences: List<String> = emptyList()
 )

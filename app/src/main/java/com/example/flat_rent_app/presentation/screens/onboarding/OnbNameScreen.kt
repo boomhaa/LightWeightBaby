@@ -37,7 +37,7 @@ fun OnbNameScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Профиль: шаг 1/3", style = MaterialTheme.typography.headlineMedium)
+            Text("Профиль: шаг 1/4", style = MaterialTheme.typography.headlineMedium)
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),

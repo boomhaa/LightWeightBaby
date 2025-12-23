@@ -10,5 +10,7 @@ sealed class Routes(val route: String) {
 
     object onbPhotoScreen : Routes("onboardingPhoto")
 
+    object onbPrefsScreen : Routes("onboardingPrefs")
+
     object onbAboutScreen : Routes("onboardingAbout")
 }

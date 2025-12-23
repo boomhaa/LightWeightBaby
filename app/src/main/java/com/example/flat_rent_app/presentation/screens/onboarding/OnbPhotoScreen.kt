@@ -56,7 +56,7 @@ fun OnbPhotoScreen(
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Профиль: шаг 2/3", style = MaterialTheme.typography.headlineMedium)
+            Text("Профиль: шаг 2/4", style = MaterialTheme.typography.headlineMedium)
 
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
