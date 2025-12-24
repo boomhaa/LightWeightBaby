@@ -159,6 +159,26 @@ class MainViewModel @Inject constructor(
             else -> "Ищу соседа"
         }
     }
+
+
+    fun openProfileDetails() {
+        val currentIndex = _state.value.currentIndex
+        val profiles = _state.value.profiles
+
+        if (currentIndex in profiles.indices) {
+            _state.update { it.copy(
+                showProfileDetails = true,
+                selectedProfile = profiles[currentIndex]
+            ) }
+        }
+    }
+
+    fun closeProfileDetails() {
+        _state.update { it.copy(
+            showProfileDetails = false,
+            selectedProfile = null
+        ) }
+    }
 }
 
 data class MainScreenState(
@@ -166,5 +186,8 @@ data class MainScreenState(
     val currentIndex: Int = -1,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val showAllViewed: Boolean = false
+    val showAllViewed: Boolean = false,
+    val showProfileDetails: Boolean = false, // ← добавить эту строку
+    val selectedProfile: SwipeProfile? = null
 )
+

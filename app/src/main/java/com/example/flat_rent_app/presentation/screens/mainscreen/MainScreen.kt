@@ -46,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.flat_rent_app.presentation.viewmodel.MainViewModel
+import com.example.flat_rent_app.presentation.screens.profiledetailscreen.ProfileDetailScreen
 
 // Моковые данные для теста
 val mockProfiles = listOf(
@@ -329,7 +330,16 @@ fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-
+    if (state.showProfileDetails) {
+        val profile = state.selectedProfile
+        if (profile != null) {
+            ProfileDetailScreen(
+                profile = profile,
+                onBack = viewModel::closeProfileDetails
+            )
+            return
+        }
+    }
     Scaffold(
     ) { pad ->
         Column(
@@ -395,8 +405,7 @@ fun MainScreen(
 
                         ExtendedFloatingActionButton(
                             onClick = {
-                                // TODO: открыть детали профиля
-                                println("Инфо о ${state.profiles[state.currentIndex].name}")
+                                viewModel.openProfileDetails()
                             },
                             containerColor = Color.Blue.copy(alpha = 0.1f),
                             contentColor = Color.Blue,
