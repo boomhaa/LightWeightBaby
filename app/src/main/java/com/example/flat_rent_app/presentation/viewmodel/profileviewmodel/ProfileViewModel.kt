@@ -2,10 +2,10 @@ package com.example.flat_rent_app.presentation.viewmodel.profileviewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.flat_rent_app.domain.model.AuthUser
 import com.example.flat_rent_app.domain.repository.AuthRepository
-import com.example.flat_rent_app.domain.repository.EditQuestionnaireRepository
+import com.example.flat_rent_app.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,37 +13,25 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val authRepo: AuthRepository,
-    private val questionnaireRepo: EditQuestionnaireRepository
+    private val profileRepo: ProfileRepository
 ) : ViewModel() {
 
-    val user: StateFlow<AuthUser?> = authRepo.currentUser
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val user = authRepo.currentUser
 
-    private val _userName = MutableStateFlow<String?>(null)
-    val userName: StateFlow<String?> = _userName.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val userProfile = user.flatMapLatest { currentUser ->
+        if (currentUser != null) {
+            profileRepo.observerProfile(currentUser.uid)
+        } else {
+            flowOf(null)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     fun signOut() {
         viewModelScope.launch { authRepo.signOut() }
-    }
-
-    fun loadUserName() {
-        viewModelScope.launch {
-            val currentUser = user.value
-            if (currentUser != null) {
-                val questionnaire = questionnaireRepo.getQuestionnaire(currentUser.uid)
-                _userName.value = questionnaire?.name
-            }
-        }
-    }
-
-    init {
-        user.onEach { user ->
-            if (user != null) {
-                val questionnaire = questionnaireRepo.getQuestionnaire(user.uid)
-                _userName.value = questionnaire?.name
-            } else {
-                _userName.value = null
-            }
-        }.launchIn(viewModelScope)
     }
 }

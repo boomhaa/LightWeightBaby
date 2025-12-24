@@ -2,23 +2,25 @@ package com.example.flat_rent_app.presentation.viewmodel.editquestionnaire
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.flat_rent_app.domain.model.UserProfile
 import com.example.flat_rent_app.domain.repository.AuthRepository
-import com.example.flat_rent_app.domain.repository.EditQuestionnaireRepository
+import com.example.flat_rent_app.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class EditQuestionnaireViewModel @Inject constructor(
-    private val editRepo: EditQuestionnaireRepository,
+    private val profileRepo: ProfileRepository,
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EditQuestionnaireState())
     val state: StateFlow<EditQuestionnaireState> = _state
-
-    private val currentUserFlow = authRepo.currentUser
 
     fun onNameChanged(name: String) {
         _state.update { it.copy(name = name) }
@@ -36,43 +38,60 @@ class EditQuestionnaireViewModel @Inject constructor(
         _state.update { it.copy(description = description) }
     }
 
-    fun saveQuestionnaire() {
+    fun toggleHabit(habitKey: String) {
+        _state.update { currentState ->
+            val currentValue = currentState.selectedHabits[habitKey] ?: false
+            val updatedHabits = currentState.selectedHabits.toMutableMap()
+            updatedHabits[habitKey] = !currentValue
+            currentState.copy(selectedHabits = updatedHabits)
+        }
+    }
+
+    val selectedHabitsList: List<String>
+        get() = state.value.selectedHabits
+            .filter { it.value }
+            .map { it.key }
+
+    fun saveProfile() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
             try {
-                val currentUser = currentUserFlow.first()
-                val userId = currentUser?.uid ?: throw Exception("Пользователь не авторизован")
+                val userId = authRepo.currentUid() ?: throw Exception("Не авторизован")
 
-                val existingQuestionnaire = editRepo.getQuestionnaire(userId)
+                val habitsString = selectedHabitsList.joinToString(", ")
 
-                val questionnaire = com.example.flat_rent_app.domain.model.EditQuestionnaire(
+                val userProfile = UserProfile(
                     uid = userId,
                     name = state.value.name,
                     city = state.value.city,
                     eduPlace = state.value.eduPlace,
-                    description = state.value.description,
-                    mainPhotoIndex = state.value.mainPhotoIndex,
-                    photoSlots = state.value.photoSlots,
-                    createdAtMillis = existingQuestionnaire?.createdAtMillis ?: System.currentTimeMillis(),
+                    description = buildString {
+                        append(state.value.description)
+                        if (habitsString.isNotBlank()) {
+                            append("\n\nПривычки: $habitsString")
+                        }
+                    },
+                    mainPhotoIndex = 0,
+                    photoSlots = emptyList(),
+                    createdAtMillis = state.value.createdAtMillis,
                     updatedAtMillis = System.currentTimeMillis()
                 )
 
-                val result = editRepo.saveQuestionnaire(questionnaire)
+                val result = profileRepo.upsertMyProfile(userProfile)
 
                 result.onSuccess {
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            isSuccess = true,
-                            error = null
+                            isSuccess = true
                         )
                     }
                 }.onFailure { error ->
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = error.message ?: "Ошибка сохранения"
+                            error = error.message
                         )
                     }
                 }
@@ -88,31 +107,34 @@ class EditQuestionnaireViewModel @Inject constructor(
         }
     }
 
-    fun loadQuestionnaire() {
+    fun loadProfile() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
             try {
-                val currentUser = currentUserFlow.first()
-                val userId = currentUser?.uid ?: return@launch
+                val userId = authRepo.currentUid() ?: return@launch
+                val profile = profileRepo.observerProfile(userId).firstOrNull()
 
-                val questionnaire = editRepo.getQuestionnaire(userId)
+                profile?.let { p ->
+                    val habitsFromDescription = parseHabitsFromDescription(p.description)
 
-                questionnaire?.let { q ->
                     _state.update {
                         it.copy(
-                            name = q.name,
-                            city = q.city,
-                            eduPlace = q.eduPlace,
-                            description = q.description,
-                            mainPhotoIndex = q.mainPhotoIndex,
-                            photoSlots = q.photoSlots,
-                            createdAtMillis = q.createdAtMillis,
+                            name = p.name,
+                            city = p.city,
+                            eduPlace = p.eduPlace,
+                            description = p.description.substringBefore("\n\nПривычки:"),
+                            selectedHabits = mergeHabits(
+                                currentHabits = it.selectedHabits,
+                                loadedHabits = habitsFromDescription
+                            ),
+                            createdAtMillis = p.createdAtMillis,
                             isLoading = false
                         )
                     }
                 } ?: run {
-                    val emailName = currentUser.email?.substringBefore("@") ?: ""
+                    val currentUser = authRepo.currentUser.firstOrNull()
+                    val emailName = currentUser?.email?.substringBefore("@") ?: ""
                     _state.update {
                         it.copy(
                             name = emailName,
@@ -125,18 +147,36 @@ class EditQuestionnaireViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = "Не удалось загрузить анкету"
+                        error = "Не удалось загрузить профиль"
                     )
                 }
             }
         }
     }
 
-    fun clearError() {
-        _state.update { it.copy(error = null) }
+    private fun parseHabitsFromDescription(description: String): List<String> {
+        val habitsPart = description.substringAfter("Привычки:", "")
+        return if (habitsPart.isNotBlank()) {
+            habitsPart.split(",").map { it.trim() }
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun mergeHabits(
+        currentHabits: Map<String, Boolean>,
+        loadedHabits: List<String>
+    ): Map<String, Boolean> {
+        val result = currentHabits.toMutableMap()
+        loadedHabits.forEach { habit ->
+            if (result.containsKey(habit)) {
+                result[habit] = true
+            }
+        }
+        return result
     }
 
     init {
-        loadQuestionnaire()
+        loadProfile()
     }
 }

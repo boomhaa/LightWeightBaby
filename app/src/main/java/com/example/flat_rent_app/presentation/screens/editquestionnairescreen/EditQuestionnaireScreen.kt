@@ -1,23 +1,33 @@
 package com.example.flat_rent_app.presentation.screens.editquestionnairescreen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.flat_rent_app.R
 import com.example.flat_rent_app.presentation.viewmodel.editquestionnaire.EditQuestionnaireViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditQuestionnaireScreen(
     onBack: () -> Unit,
-    onSaveComplete: () -> Unit
+    onSaveComplete: () -> Unit,
+    viewModel: EditQuestionnaireViewModel = hiltViewModel()
 ) {
-    val viewModel: EditQuestionnaireViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state.isSuccess) {
@@ -26,42 +36,60 @@ fun EditQuestionnaireScreen(
         }
     }
 
-    Scaffold { pad ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Моя анкета",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                OutlinedButton(onClick = onBack) {
+                    Text("Назад")
+                }
+
+                Button(
+                    onClick = { viewModel.saveProfile() },
+                    enabled = !state.isLoading
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
+                    } else {
+                        Text("Сохранить")
+                    }
+                }
+            }
+        }
+    ) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                text = "Моя анкета",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "Измени свою анкету",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                textAlign = TextAlign.Center
-            )
-
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 OutlinedTextField(
                     value = state.name,
                     onValueChange = viewModel::onNameChanged,
-                    label = { Text("Ваше имя") },
-                    placeholder = { Text("Как вас зовут?") },
+                    label = { Text("Имя") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -77,7 +105,7 @@ fun EditQuestionnaireScreen(
                 OutlinedTextField(
                     value = state.eduPlace,
                     onValueChange = viewModel::onEduPlaceChanged,
-                    label = { Text("Учеба/Работа") },
+                    label = { Text("Учебное заведение") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -90,36 +118,48 @@ fun EditQuestionnaireScreen(
                         .fillMaxWidth()
                         .height(120.dp)
                 )
-            }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = { viewModel.saveQuestionnaire() },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !state.isLoading
-                ) {
-                    if (state.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    } else {
-                        Text("Сохранить изменения")
+                Text(
+                    text = "Привычки и предпочтения",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Column {
+                    state.selectedHabits.keys.toList().chunked(2).forEach { rowHabits ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowHabits.forEach { habit ->
+                                val isSelected = state.selectedHabits[habit] ?: false
+
+                                Box(modifier = Modifier.weight(1f)) {
+                                    FilterChip(
+                                        selected = isSelected,
+                                        onClick = { viewModel.toggleHabit(habit) },
+                                        label = {
+                                            Text(
+                                                text = habit,
+                                                maxLines = 2,
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                            if (rowHabits.size == 1) {
+                                Box(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
-                }
-
-                OutlinedButton(
-                    onClick = onBack,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Назад в профиль")
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
