@@ -61,7 +61,6 @@ retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.re
 okhttp-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 

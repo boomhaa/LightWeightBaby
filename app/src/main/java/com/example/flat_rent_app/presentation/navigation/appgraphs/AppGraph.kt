@@ -1,10 +1,14 @@
 package com.example.flat_rent_app.presentation.navigation.appgraphs
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.flat_rent_app.presentation.navigation.Routes
+import com.example.flat_rent_app.presentation.screens.chatscreen.ChatScreen
+import com.example.flat_rent_app.presentation.screens.chatsscreen.ChatsScreen
 import com.example.flat_rent_app.presentation.screens.mainscreen.MainScreen
 import com.example.flat_rent_app.presentation.screens.profilescreen.ProfileScreen
 import com.example.flat_rent_app.presentation.screens.questionnairescreen.QuestionnaireScreen
@@ -39,6 +43,22 @@ fun AppGraph() {
                 onBack = {navController.popBackStack()},
                 onSaveComplete = {navController.popBackStack()}
             )
+        }
+
+        composable(Routes.ChatsScreen.route) {
+            ChatsScreen(onOpenChat = { chatId, otherUid ->
+                navController.navigate(Routes.ChatScreen.create(chatId, otherUid))
+            })
+        }
+
+        composable(
+            route = Routes.ChatScreen.route,
+            arguments = listOf(
+                navArgument("chatId") { type = NavType.StringType },
+                navArgument("otherUid") { type = NavType.StringType }
+            )
+        ) {
+            ChatScreen(onBack = { navController.popBackStack() })
         }
     }
 }
