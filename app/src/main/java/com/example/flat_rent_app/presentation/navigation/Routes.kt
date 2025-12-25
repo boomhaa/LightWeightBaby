@@ -7,4 +7,5 @@ sealed class Routes(val route: String) {
     object profileScreen : Routes("profile")
     object formScreen : Routes("form")
     object EditQuestionnaire : Routes("editquestionnaire")
+    object welcomeScreen : Routes("welcome")
 }
