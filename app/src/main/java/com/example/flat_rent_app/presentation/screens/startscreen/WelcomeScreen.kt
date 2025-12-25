@@ -31,9 +31,9 @@ fun WelcomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = 28.dp)
+            .padding(top = 130.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_welcome_logo),
@@ -58,7 +58,7 @@ fun WelcomeScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(120.dp))
 
         OutlinedButton(
             onClick = onRegister,
