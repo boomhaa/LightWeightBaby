@@ -27,7 +27,7 @@ fun AuthGraph() {
 
         composable(Routes.authScreen.route) {
             LoginScreen(
-                onGoRegister = { navController.navigate(Routes.regScreen.route) }
+                onBack = {  navController.popBackStack() }
             )
         }
 

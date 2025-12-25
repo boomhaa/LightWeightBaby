@@ -1,6 +1,8 @@
 package com.example.flat_rent_app.presentation.screens.loginscreen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -8,57 +10,120 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.flat_rent_app.presentation.viewmodel.authviewmodel.AuthViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
+import com.example.flat_rent_app.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onGoRegister: () -> Unit,
+    onBack: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    var passVisible by remember { mutableStateOf(false) }
 
-    Scaffold { pad ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = onBack,
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                title = {Text("")},
+            )
+        }
+    ) { pad ->
         Column(
             modifier = Modifier
                 .padding(pad)
-                .padding(16.dp)
+                .padding(horizontal = 24.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Авторизация", style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(28.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_login_home),
+                contentDescription = null,
+                modifier = Modifier.size(84.dp)
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                text = stringResource(R.string.login_title),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(Modifier.height(26.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.email,
                 onValueChange = viewModel::onEmail,
-                label = { Text("Email") },
-                singleLine = true
+                placeholder = { Text(stringResource(R.string.login_email_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                shape = RoundedCornerShape(28.dp)
             )
+
+            Spacer(Modifier.height(12.dp))
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.password,
                 onValueChange = viewModel::onPassword,
-                label = { Text("Пароль") },
-                visualTransformation = PasswordVisualTransformation(),
-                singleLine = true
+                placeholder = { Text(stringResource(R.string.login_password_hint)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { passVisible = !passVisible }) {
+                        Icon(
+                            imageVector = if (passVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = null
+                        )
+                    }
+                },
+                shape = RoundedCornerShape(28.dp)
             )
 
-            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !state.loading,
-                onClick = viewModel ::login
-            ) {
-                if (state.loading) {
-                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                    Spacer(Modifier.width(8.dp))
-                }
-                Text("Войти")
+            state.error?.let {
+                Spacer(Modifier.height(10.dp))
+                Text(it, color = MaterialTheme.colorScheme.error)
             }
 
-            TextButton(onClick = onGoRegister) {
-                Text("Нет аккаунта? Регистрация")
+            Spacer(Modifier.height(28.dp))
+
+            Button(
+                onClick = { viewModel.login() },
+                enabled = !state.loading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                if (state.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(Modifier.width(10.dp))
+                }
+                Text(stringResource(R.string.login_submit))
             }
         }
     }
