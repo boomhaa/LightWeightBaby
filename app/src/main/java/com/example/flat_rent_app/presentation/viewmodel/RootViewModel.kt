@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.flat_rent_app.domain.model.AuthUser
 import com.example.flat_rent_app.domain.model.UserProfile
+import com.example.flat_rent_app.domain.model.isComplete
 import com.example.flat_rent_app.domain.repository.AuthRepository
 import com.example.flat_rent_app.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,17 +31,6 @@ class RootViewModel @Inject constructor(
             if (u == null) flowOf(null)
             else profileRepo.observerProfile(u.uid)
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
-
-    fun UserProfile.isComplete(): Boolean {
-        val base =
-            name.isNotBlank() &&
-                    city.isNotBlank() &&
-                    eduPlace.isNotBlank() &&
-                    description.isNotBlank()
-
-        val hasPhoto = photoSlots.firstOrNull() != null
-        return base && hasPhoto
-    }
 
     val isProfileComplete: StateFlow<Boolean> =
         profile.map { p -> p?.isComplete() == true }

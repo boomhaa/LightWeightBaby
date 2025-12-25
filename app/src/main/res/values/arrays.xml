@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="onboarding_prefs_options">
+        <item>Курение разрешено</item>
+        <item>Пью алкоголь</item>
+        <item>Сова</item>
+        <item>Жаворонок</item>
+        <item>Животные</item>
+        <item>Приглашаю гостей</item>
+        <item>Чистота</item>
+        <item>Тишина</item>
+        <item>Музыка</item>
+    </string-array>
+</resources>

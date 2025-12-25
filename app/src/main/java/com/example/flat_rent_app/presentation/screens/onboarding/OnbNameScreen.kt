@@ -3,21 +3,17 @@ package com.example.flat_rent_app.presentation.screens.onboarding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.flat_rent_app.presentation.viewmodel.onboarding.OnboardingViewModel
 
 @Composable
@@ -29,53 +25,56 @@ fun OnbNameScreen(
 
     val canGoNext = state.name.isNotBlank() && state.city.isNotBlank() && state.eduPlace.isNotBlank()
 
-    Scaffold { pad ->
+    OnboardingScaffold(
+        step = 1,
+        totalSteps = 4,
+        title = "Расскажите о себе 👋",
+        footer = {
+            OnboardingFooter(
+                onNext = {
+                    if (canGoNext) onNext() else viewModel.onName(state.name)
+                },
+                nextEnabled = canGoNext
+            )
+        }
+    ) {
         Column(
-            modifier = Modifier
-                .padding(pad)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text("Профиль: шаг 1/4", style = MaterialTheme.typography.headlineMedium)
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            OnbFieldLabel(label = "Как Вас зовут?", icon = OnbIcon.Person)
+            OnbTextField(
                 value = state.name,
                 onValueChange = viewModel::onName,
-                label = { Text("Имя") },
+                placeholder = "Имя",
                 singleLine = true
             )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            OnbFieldLabel(label = "Город", icon = OnbIcon.Location)
+            OnbTextField(
                 value = state.city,
                 onValueChange = viewModel::onCity,
-                label = { Text("Город") },
+                placeholder = "Город обучения",
                 singleLine = true
             )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            OnbFieldLabel(label = "Учебное заведение", icon = OnbIcon.School)
+            OnbTextField(
                 value = state.eduPlace,
                 onValueChange = viewModel::onEduPlace,
-                label = { Text("ВУЗ") },
-                singleLine = true
+                placeholder = "Место учебы",
+                singleLine = true,
             )
 
-            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-
-            Spacer(Modifier.height(4.dp))
-
-            Button(
-                onClick = {
-                    if (canGoNext) onNext() else viewModel.onName(state.name) // just clears error
-                },
-                enabled = canGoNext,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Далее")
+            state.error?.let {
+                Text(
+                    it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
             }
+            Spacer(Modifier.height(2.dp))
         }
     }
 }

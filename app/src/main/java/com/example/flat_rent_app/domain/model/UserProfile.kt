@@ -12,3 +12,6 @@ data class UserProfile(
     val updatedAtMillis: Long? = null,
     val preferences: List<String> = emptyList()
 )
+
+fun UserProfile.isComplete(): Boolean =
+    name.isNotBlank() && city.isNotBlank() && eduPlace.isNotBlank() && description.isNotBlank() && photoSlots.any { it != null }
