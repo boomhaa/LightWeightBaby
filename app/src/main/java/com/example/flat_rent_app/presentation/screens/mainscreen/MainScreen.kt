@@ -385,13 +385,6 @@ fun MainScreen(
                 ) {
                     Text("Перейти в профиль")
                 }
-
-                Button(
-                    onClick = onGoQuestionnaire,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Анкета (заглушка)")
-                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
