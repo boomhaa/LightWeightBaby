@@ -13,4 +13,6 @@ sealed class Routes(val route: String) {
     object onbPrefsScreen : Routes("onboardingPrefs")
 
     object onbAboutScreen : Routes("onboardingAbout")
+    object EditQuestionnaire : Routes("editquestionnaire")
+    object welcomeScreen : Routes("welcome")
 }

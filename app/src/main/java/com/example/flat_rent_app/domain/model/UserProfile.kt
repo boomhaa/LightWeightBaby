@@ -15,3 +15,5 @@ data class UserProfile(
 
 fun UserProfile.isComplete(): Boolean =
     name.isNotBlank() && city.isNotBlank() && eduPlace.isNotBlank() && description.isNotBlank() && photoSlots.any { it != null }
+    val updatedAtMillis: Long? = null
+)

@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.flat_rent_app.presentation.navigation.Routes
 import com.example.flat_rent_app.presentation.screens.loginscreen.LoginScreen
 import com.example.flat_rent_app.presentation.screens.regscreen.RegisterScreen
+import com.example.flat_rent_app.presentation.screens.startscreen.WelcomeScreen
 
 @Composable
 fun AuthGraph() {
@@ -15,11 +16,18 @@ fun AuthGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.authScreen.route
+        startDestination = Routes.welcomeScreen.route
     ) {
+        composable(Routes.welcomeScreen.route){
+            WelcomeScreen(
+                onLogin = { navController.navigate(Routes.authScreen.route)},
+                onRegister = { navController.navigate(Routes.regScreen.route)  }
+            )
+        }
+
         composable(Routes.authScreen.route) {
             LoginScreen(
-                onGoRegister = { navController.navigate(Routes.regScreen.route) }
+                onBack = {  navController.popBackStack() }
             )
         }
 

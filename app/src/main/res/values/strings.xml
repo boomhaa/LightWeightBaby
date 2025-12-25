@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">flat-rent-app</string>
+
+    <string name="welcome_title">Найди идеального\nсоседа-студента</string>
+    <string name="welcome_subtitle">Экономь на аренде и живи комфортно — умные фильтры и честные анкеты помогут подобрать того, кто тебе подходит.</string>
+    <string name="action_register">Регистрация</string>
+    <string name="action_login">Войти</string>
+
+    <string name="reg_title">Создай аккаунт</string>
+    <string name="reg_email_label">Введите email</string>
+    <string name="reg_password_label">Введите пароль</string>
+    <string name="reg_password_repeat_label">Повторите пароль</string>
+    <string name="reg_submit">Зарегистрироваться</string>
+
+    <string name="login_title">Вход в систему</string>
+    <string name="login_email_hint">user@gmail.com</string>
+    <string name="login_password_hint">Пароль</string>
+    <string name="login_submit">Войти</string>
+    <string name="login_restore">Восстановить пароль</string>
+
 </resources>
