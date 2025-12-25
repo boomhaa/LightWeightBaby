@@ -38,8 +38,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.flat_rent_app.domain.model.BottomTab
+import com.example.flat_rent_app.presentation.components.AppBottomBar
 import com.example.flat_rent_app.presentation.viewmodel.mainviewmodel.MainViewModel
 import com.example.flat_rent_app.presentation.screens.profiledetailscreen.ProfileDetailScreen
+import com.example.flat_rent_app.util.BottomTabs
 
 
 @Composable
@@ -271,7 +274,7 @@ fun AllViewedView(onRetry: () -> Unit) {
 @Composable
 fun MainScreen(
     onGoProfile: () -> Unit,
-    onGoQuestionnaire: () -> Unit,
+    onGoChats: () -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -286,6 +289,14 @@ fun MainScreen(
         }
     }
     Scaffold(
+        bottomBar = {
+            AppBottomBar(
+                selected = BottomTabs.HOME,
+                onHome = { /* уже здесь */},
+                onChats = onGoChats,
+                onProfile = onGoProfile
+            )
+        }
     ) { pad ->
         Column(
             modifier = Modifier

@@ -15,101 +15,108 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.flat_rent_app.presentation.viewmodel.profileviewmodel.ProfileViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.example.flat_rent_app.presentation.components.AppBottomBar
+import com.example.flat_rent_app.util.BottomTabs
 
 @Composable
 fun ProfileScreen(
-    onBack: () -> Unit,
+    onGoHome: () -> Unit,
+    onGoChats: () -> Unit,
     onEditQuestionnaire: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val user by viewModel.user.collectAsState(initial = null)
     val userProfile by viewModel.userProfile.collectAsState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
+    Scaffold(
+        bottomBar = {
+            AppBottomBar(
+                selected = BottomTabs.PROFILE,
+                onHome = onGoHome,
+                onChats = onGoChats,
+                onProfile = { /* уже тут */ }
+            )
+        }
+    ) { pad ->
+        Column(
             modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(pad)
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            val mainPhotoUrl = userProfile?.photoSlots
-                ?.getOrNull(userProfile?.mainPhotoIndex ?: 0)
-                ?.fullUrl
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                val mainPhotoUrl = userProfile?.photoSlots
+                    ?.getOrNull(userProfile?.mainPhotoIndex ?: 0)
+                    ?.fullUrl
 
-            if (mainPhotoUrl != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(mainPhotoUrl),
-                    contentDescription = "Аватар",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
+                if (mainPhotoUrl != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(mainPhotoUrl),
+                        contentDescription = "Аватар",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(
+                        text = "👤",
+                        style = MaterialTheme.typography.displayLarge
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            val displayName = when {
+                !userProfile?.name.isNullOrBlank() -> userProfile?.name!!
+                !user?.email.isNullOrBlank() -> user?.email?.substringBefore("@") ?: "Пользователь"
+                else -> "Пользователь"
+            }
+
+            Text(
+                text = displayName,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            user?.email?.let { email ->
                 Text(
-                    text = "👤",
-                    style = MaterialTheme.typography.displayLarge
+                    text = email,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 48.dp)
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onEditQuestionnaire,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+            ) {
+                Text("Анкета")
+            }
 
-        val displayName = when {
-            !userProfile?.name.isNullOrBlank() -> userProfile?.name!!
-            !user?.email.isNullOrBlank() -> user?.email?.substringBefore("@") ?: "Пользователь"
-            else -> "Пользователь"
-        }
-
-        Text(
-            text = displayName,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        user?.email?.let { email ->
-            Text(
-                text = email,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 48.dp)
-            )
-        }
-
-        Button(
-            onClick = onEditQuestionnaire,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
-        ) {
-            Text("Анкета")
-        }
-
-        Button(
-            onClick = viewModel::signOut,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            )
-        ) {
-            Text("Выйти")
-        }
-
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Назад")
+            Button(
+                onClick = viewModel::signOut,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text("Выйти")
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ fun OnbAboutScreen(
     }
 
     OnboardingScaffold(
+
         step = 4,
         totalSteps = 4,
         title = "Расскажите о себе 🤗",

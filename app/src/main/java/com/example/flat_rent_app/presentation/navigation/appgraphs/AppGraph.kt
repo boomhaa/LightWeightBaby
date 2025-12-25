@@ -18,6 +18,7 @@ import com.example.flat_rent_app.presentation.screens.editquestionnairescreen.Ed
 fun AppGraph() {
     val navController = rememberNavController()
 
+
     NavHost(
         navController = navController,
         startDestination = Routes.homeScreen.route
@@ -25,13 +26,15 @@ fun AppGraph() {
         composable(Routes.homeScreen.route) {
             MainScreen(
                 onGoProfile = { navController.navigate(Routes.profileScreen.route) },
-                onGoQuestionnaire = { navController.navigate(Routes.formScreen.route) }
+                onGoChats = { navController.navigate(Routes.ChatsScreen.route) },
             )
         }
 
         composable(Routes.profileScreen.route) {
-            ProfileScreen(onBack = { navController.popBackStack() },
-                onEditQuestionnaire = {navController.navigate(Routes.EditQuestionnaire.route)})
+            ProfileScreen(
+                onGoHome = { navController.navigate(Routes.homeScreen.route) },
+                onGoChats = { navController.navigate(Routes.ChatsScreen.route) },
+                onEditQuestionnaire = { navController.navigate(Routes.EditQuestionnaire.route) })
         }
 
         composable(Routes.formScreen.route) {
@@ -40,15 +43,17 @@ fun AppGraph() {
 
         composable(Routes.EditQuestionnaire.route) {
             EditQuestionnaireScreen(
-                onBack = {navController.popBackStack()},
-                onSaveComplete = {navController.popBackStack()}
+                onBack = { navController.popBackStack() },
+                onSaveComplete = { navController.popBackStack() }
             )
         }
 
         composable(Routes.ChatsScreen.route) {
             ChatsScreen(onOpenChat = { chatId, otherUid ->
                 navController.navigate(Routes.ChatScreen.create(chatId, otherUid))
-            })
+            },
+                onGoHome = { navController.navigate(Routes.homeScreen.route) },
+                onGoProfile = { navController.navigate(Routes.profileScreen.route) },)
         }
 
         composable(

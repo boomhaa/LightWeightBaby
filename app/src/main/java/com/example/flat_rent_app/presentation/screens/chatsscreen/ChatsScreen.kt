@@ -8,13 +8,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.flat_rent_app.presentation.components.AppBottomBar
 import com.example.flat_rent_app.presentation.screens.chatsscreen.components.ChatRow
 import com.example.flat_rent_app.presentation.viewmodel.chatsviewmodel.ChatsViewModel
+import com.example.flat_rent_app.util.BottomTabs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatsScreen(
     onOpenChat: (chatId: String, otherUid: String) -> Unit,
+    onGoHome: () -> Unit,
+    onGoProfile: () -> Unit,
     viewmodel: ChatsViewModel = hiltViewModel()
 ) {
     val items by viewmodel.items.collectAsState()
@@ -28,6 +32,14 @@ fun ChatsScreen(
                         Icon(Icons.Default.Search, contentDescription = null)
                     }
                 }
+            )
+        },
+        bottomBar = {
+            AppBottomBar(
+                selected = BottomTabs.CHATS,
+                onHome = onGoHome,
+                onChats = { /* уже тут */ },
+                onProfile = onGoProfile
             )
         }
     ) { pad ->
