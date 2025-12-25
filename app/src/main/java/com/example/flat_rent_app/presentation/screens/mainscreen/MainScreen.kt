@@ -31,56 +31,15 @@ import com.example.flat_rent_app.domain.model.SwipeProfile
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.abs
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.flat_rent_app.presentation.viewmodel.MainViewModel
+import com.example.flat_rent_app.presentation.viewmodel.mainviewmodel.MainViewModel
 import com.example.flat_rent_app.presentation.screens.profiledetailscreen.ProfileDetailScreen
-
-// Моковые данные для теста
-val mockProfiles = listOf(
-    SwipeProfile(
-        uid = "1",
-        name = "Антон",
-        age = 23,
-        city = "Москва, Россия",
-        university = "МГТУ им. Н. Э. Баумана",
-        description = "Тишина",
-        lookingFor = "Работаю",
-        photoUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop"
-    ),
-    SwipeProfile(
-        uid = "2",
-        name = "Мария",
-        age = 24,
-        city = "Санкт-Петербург, Россия",
-        university = "СПбГУ",
-        description = "Люблю готовить",
-        lookingFor = "Учусь",
-        photoUrl = "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=800&auto=format&fit=crop"
-    ),
-    SwipeProfile(
-        uid = "3",
-        name = "Иван",
-        age = 25,
-        city = "Казань, Россия",
-        university = "КФУ",
-        description = "Спокойный",
-        lookingFor = "Работаю удалённо",
-        photoUrl = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop"
-    )
-)
 
 
 @Composable
@@ -102,7 +61,6 @@ fun SwipeableProfileCard(
                         offsetX += dragAmount.x
                         offsetY += dragAmount.y
 
-                        // Если свайпнули достаточно далеко по горизонтали
                         if (abs(offsetX) > 300f) {
                             if (offsetX > 0) {
                                 onSwipeRight()
@@ -114,7 +72,6 @@ fun SwipeableProfileCard(
                         }
                     },
                     onDragEnd = {
-                        // Возвращаем карточку на место если не дотянули
                         offsetX = 0f
                         offsetY = 0f
                     }
@@ -132,7 +89,6 @@ fun SwipeableProfileCard(
             photoUrl = profile.photoUrl
         )
 
-        // Индикатор направления свайпа
         if (abs(offsetX) > 50f) {
             val color = if (offsetX > 0) Color.Green else Color.Red
             val icon = if (offsetX > 0) Icons.Default.Favorite else Icons.Default.Close
@@ -174,7 +130,7 @@ fun ProfileCard(
     university: String,
     description: String,
     lookingFor: String,
-    photoUrl: String? = null  // ← новый параметр для фото
+    photoUrl: String? = null
 ) {
     Card(
         modifier = Modifier
@@ -185,7 +141,6 @@ fun ProfileCard(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Фоновая картинка
             if (photoUrl != null) {
                 AsyncImage(
                     model = photoUrl,
@@ -194,36 +149,32 @@ fun ProfileCard(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // Если нет фото - градиентный фон
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color(0xFF6A11CB), // Фиолетовый сверху
-                                    Color(0xFF2575FC)  // Синий снизу
+//                                    Color(0xFF6A11CB),
+                                    Color(0xFF2575FC)
                                 )
                             )
                         )
                 )
             }
 
-            // Полупрозрачный чёрный слой сверху для лучшей читаемости текста
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.2f))
             )
 
-            // Текст поверх фото
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(24.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Имя и возраст - вверху
                 Text(
                     text = "$name, $age",
                     fontSize = 32.sp,
@@ -231,9 +182,7 @@ fun ProfileCard(
                     color = Color.White
                 )
 
-                // Информация - внизу
                 Column {
-                    // Город с иконкой
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -253,7 +202,6 @@ fun ProfileCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Университет с иконкой
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -272,8 +220,6 @@ fun ProfileCard(
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
-
-                    // Описание в белой плашке
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = Color.White.copy(alpha = 0.9f)
@@ -305,7 +251,6 @@ fun ProfileCard(
         }
     }
 }
-
 
 
 @Composable
@@ -349,15 +294,20 @@ fun MainScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Основной контент
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 when {
                     state.isLoading -> {
-                        LoadingView()
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LoadingView()
+                        }
                     }
+
 
                     state.error != null -> {
                         ErrorView(
@@ -388,56 +338,44 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Кнопки действий (только если есть данные)
             if (!state.isLoading && state.error == null && state.profiles.isNotEmpty() && !state.showAllViewed) {
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        ExtendedFloatingActionButton(
+                        FloatingActionButton(
                             onClick = viewModel::swipeLeft,
-                            containerColor = Color.Red.copy(alpha = 0.1f),
-                            contentColor = Color.Red,
-                            icon = { Icon(Icons.Default.Close, "Пас") },
-                            text = { Text("Пас") }
-                        )
+                            containerColor = Color(0xFFEEEEEE),
+                            contentColor = Color.Black,
+                            elevation = FloatingActionButtonDefaults.elevation(0.dp)
+                        ) {
+                            Text("Нет", fontWeight = FontWeight.Bold)
+                        }
 
-                        ExtendedFloatingActionButton(
-                            onClick = {
-                                viewModel.openProfileDetails()
-                            },
-                            containerColor = Color.Blue.copy(alpha = 0.1f),
-                            contentColor = Color.Blue,
-                            icon = { Icon(Icons.Default.Info, "Инфо") },
-                            text = { Text("Инфо") }
-                        )
+                        FloatingActionButton(
+                            onClick = { viewModel.openProfileDetails() },
+                            containerColor = Color(0xFFEEEEEE),
+                            contentColor = Color.Black,
+                            elevation = FloatingActionButtonDefaults.elevation(0.dp)
+                        ) {
+                            Text("Инфо", fontWeight = FontWeight.Bold)
+                        }
 
-                        ExtendedFloatingActionButton(
+                        FloatingActionButton(
                             onClick = viewModel::swipeRight,
-                            containerColor = Color.Green.copy(alpha = 0.1f),
-                            contentColor = Color.Green,
-                            icon = { Icon(Icons.Default.Favorite, "Лайк") },
-                            text = { Text("Лайк") }
-                        )
+                            containerColor = Color(0xFFEEEEEE),
+                            contentColor = Color.Black,
+                            elevation = FloatingActionButtonDefaults.elevation(0.dp)
+                        ) {
+                            Text("Да", fontWeight = FontWeight.Bold)
+                        }
                     }
-
-                    // Счетчик профилей
-                    Text(
-                        text = "${state.currentIndex + 1}/${state.profiles.size}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp),
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Кнопки навигации
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

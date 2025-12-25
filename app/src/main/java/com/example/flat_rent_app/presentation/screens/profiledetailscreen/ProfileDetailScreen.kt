@@ -30,7 +30,7 @@ fun ProfileDetailScreen(
                 title = {
                     Text(
                         "Профиль",
-                        color = Color.White
+                        color = Color.Black
                     )
                 },
                 navigationIcon = {
@@ -38,12 +38,12 @@ fun ProfileDetailScreen(
                         Icon(
                             Icons.Default.Close,
                             contentDescription = "Закрыть",
-                            tint = Color.White
+                            tint = Color.Black
                         )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF6A11CB)
+                    containerColor = Color.Transparent
                 )
             )
         }
@@ -55,7 +55,6 @@ fun ProfileDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Фото профиля
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -83,7 +82,6 @@ fun ProfileDetailScreen(
                     )
                 }
 
-                // Имя и возраст поверх фото
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -99,7 +97,6 @@ fun ProfileDetailScreen(
                 }
             }
 
-            // Основная информация
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,7 +107,6 @@ fun ProfileDetailScreen(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Локация
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -135,9 +131,8 @@ fun ProfileDetailScreen(
                         }
                     }
 
-                    Divider()
+                    HorizontalDivider()
 
-                    // Образование
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -162,9 +157,8 @@ fun ProfileDetailScreen(
                         }
                     }
 
-                    Divider()
+                    HorizontalDivider()
 
-                    // О себе
                     Column {
                         Text(
                             text = "О себе",
@@ -179,9 +173,7 @@ fun ProfileDetailScreen(
                         )
                     }
 
-                    Divider()
-
-                    // Что ищет
+                    HorizontalDivider()
                     Column {
                         Text(
                             text = "Ищет",

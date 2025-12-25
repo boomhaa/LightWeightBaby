@@ -1,4 +1,4 @@
-package com.example.flat_rent_app.presentation.viewmodel
+package com.example.flat_rent_app.presentation.viewmodel.mainviewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,10 +31,8 @@ class MainViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                // Задержка 2 секунды (как в задании)
                 delay(2000L)
 
-                // Получаем реальные профили из репозитория
                 val result = profileRepository.getFeedProfiles(limit = 10)
 
                 result.onSuccess { userProfiles ->
@@ -81,17 +79,14 @@ class MainViewModel @Inject constructor(
             val targetId = profiles[currentIndex].uid
 
             viewModelScope.launch {
-                // Отправляем лайк через существующий репозиторий
                 swipeRepository.likeUser(targetId)
                     .onSuccess { outcome ->
-                        // outcome может быть LikedOnly или Match
                         println("Лайк отправлен: $outcome")
                     }
                     .onFailure { error ->
                         println("Ошибка лайка: ${error.message}")
                     }
 
-                // Переключаем на следующего пользователя
                 moveToNext()
             }
         }
@@ -128,7 +123,6 @@ class MainViewModel @Inject constructor(
             if (nextIndex < profiles.size) {
                 state.copy(currentIndex = nextIndex)
             } else {
-                // Все просмотрены, начинаем сначала или показываем пустое состояние
                 state.copy(
                     currentIndex = if (profiles.isNotEmpty()) 0 else -1,
                     showAllViewed = profiles.isNotEmpty()
@@ -141,13 +135,11 @@ class MainViewModel @Inject constructor(
         loadProfiles()
     }
 
-    // Вспомогательные функции для парсинга данных
     private fun extractName(fullName: String): String {
         return fullName.split(",").firstOrNull()?.trim() ?: fullName
     }
 
     private fun extractAgeFromDescription(description: String): Int {
-        // Простая логика для примера
         return (18..35).random()
     }
 
@@ -180,14 +172,3 @@ class MainViewModel @Inject constructor(
         ) }
     }
 }
-
-data class MainScreenState(
-    val profiles: List<SwipeProfile> = emptyList(),
-    val currentIndex: Int = -1,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val showAllViewed: Boolean = false,
-    val showProfileDetails: Boolean = false, // ← добавить эту строку
-    val selectedProfile: SwipeProfile? = null
-)
-
