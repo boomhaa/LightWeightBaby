@@ -8,6 +8,7 @@ import com.example.flat_rent_app.presentation.navigation.Routes
 import com.example.flat_rent_app.presentation.screens.mainscreen.MainScreen
 import com.example.flat_rent_app.presentation.screens.profilescreen.ProfileScreen
 import com.example.flat_rent_app.presentation.screens.questionnairescreen.QuestionnaireScreen
+import com.example.flat_rent_app.presentation.screens.editquestionnairescreen.EditQuestionnaireScreen
 
 @Composable
 fun AppGraph() {
@@ -19,19 +20,25 @@ fun AppGraph() {
     ) {
         composable(Routes.homeScreen.route) {
             MainScreen(
-                onGoProfile = { navController.navigate(Routes.profileScreen.route){
-
-                } },
+                onGoProfile = { navController.navigate(Routes.profileScreen.route) },
                 onGoQuestionnaire = { navController.navigate(Routes.formScreen.route) }
             )
         }
 
         composable(Routes.profileScreen.route) {
-            ProfileScreen(onBack = { navController.popBackStack() })
+            ProfileScreen(onBack = { navController.popBackStack() },
+                onEditQuestionnaire = {navController.navigate(Routes.EditQuestionnaire.route)})
         }
 
         composable(Routes.formScreen.route) {
             QuestionnaireScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.EditQuestionnaire.route) {
+            EditQuestionnaireScreen(
+                onBack = {navController.popBackStack()},
+                onSaveComplete = {navController.popBackStack()}
+            )
         }
     }
 }

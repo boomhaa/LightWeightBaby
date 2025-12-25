@@ -10,5 +10,4 @@ data class UserProfile(
     val photoSlots: List<ProfilePhoto?> = listOf(null, null, null),
     val createdAtMillis: Long? = null,
     val updatedAtMillis: Long? = null
-
 )
